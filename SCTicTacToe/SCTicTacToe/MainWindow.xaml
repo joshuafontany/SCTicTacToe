@@ -290,13 +290,14 @@
                     </Button>
                 </StackPanel>
 
-                <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="3" Margin="0,2,0,30" BorderThickness="1" Background="Black" CornerRadius="5" BorderBrush="Silver">
+                <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Margin="0,2,0,0" BorderThickness="1" Background="Black" CornerRadius="5" BorderBrush="Silver">
                     <Border.Effect>
                         <DropShadowEffect Direction="225" ShadowDepth="10" BlurRadius="10" Opacity="0.9" />
                     </Border.Effect>
                     <StackPanel>
                         <TextBox Visibility="Collapsed" HorizontalAlignment="Center" Height="22" Margin="5" TextWrapping="Wrap" Text="{Binding Foo, Mode=TwoWay}" VerticalAlignment="Top" Width="200"/>
-                        <ListView Margin="10" Name="LeaderboardListView" ItemsSource="{Binding PlayerRecordsInstance.Leaderboard}" Foreground="Silver" Background="Black">
+                        <ListView Margin="10" Name="LeaderboardListView" ItemsSource="{Binding PlayerRecordsInstance.Leaderboard}" 
+                                  Height="320" Foreground="Silver" Background="Black">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
                                     <Setter Property="Focusable" Value="false"/>
