@@ -12,6 +12,7 @@ copyrighted material or trademarks in this file should not be
 viewed as a challenge to those copyrights or trademarks.
 
 Features include:
+
 2 Game Modes: Tic Tac Toe (3 In A Row), and Domoku (5 In a Row, played on larger boards). Choose game mode on the New Game screen.
 
 UI fully skinned and themed on Starcraft Classic (from resources and wallpaper available on Battle.Net). Each game represents a skirmish on the never ending wars between the Terran, Zerg, and Protoss forces. Gotta tell the StarCraft story!
