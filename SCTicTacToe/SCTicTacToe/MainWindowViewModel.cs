@@ -311,8 +311,11 @@ namespace SCTicTacToe
                 if (toUpdate1.Count() > 0)
                 {
                     Player oldPlayerStats = toUpdate1.First<Player>();
-                    oldPlayerStats.FactionIcon = NewPlayer1.FactionIcon;
+                    oldPlayerStats.PlayerFaction = NewPlayer1.PlayerFaction;
+                    oldPlayerStats.FactionIcon = Images.Instance.GetFactionIcon((int)this.NewPlayer1.PlayerFaction);
+                    oldPlayerStats.GamePieceImage = Images.Instance.GetGamePiece((int)this.NewPlayer1.PlayerFaction * 2);
                     oldPlayerStats.HeroIcon = NewPlayer1.HeroIcon;
+                    
                     NewPlayer1 = oldPlayerStats;
 
                     this.PlayerRecordsInstance.Leaderboard.Remove(oldPlayerStats);
@@ -327,7 +330,9 @@ namespace SCTicTacToe
                 if (toUpdate2.Count() > 0)
                 {
                     Player oldPlayerStats = toUpdate2.First<Player>();
-                    oldPlayerStats.FactionIcon = NewPlayer2.FactionIcon;
+                    oldPlayerStats.PlayerFaction = NewPlayer2.PlayerFaction;
+                    oldPlayerStats.FactionIcon = Images.Instance.GetFactionIcon((int)this.NewPlayer2.PlayerFaction);
+                    oldPlayerStats.GamePieceImage = Images.Instance.GetGamePiece((int)this.NewPlayer2.PlayerFaction * 2);
                     oldPlayerStats.HeroIcon = NewPlayer2.HeroIcon;
                     NewPlayer2 = oldPlayerStats;
 

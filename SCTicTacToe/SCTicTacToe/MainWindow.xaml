@@ -576,14 +576,14 @@
                             <StackPanel Orientation="Horizontal" Margin="80,0,0,0">
                                 <Viewbox Width="20" Margin="5,0,0,0">
                                     <RadioButton GroupName="P1Factions" VerticalAlignment="Center"
-                            IsChecked="{Binding Path=NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            IsChecked="{Binding NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
                             ConverterParameter={x:Static local:PlayerFaction._0_Terran}}">
                                     </RadioButton>
                                 </Viewbox>
                                 <Image Source="pack://application:,,,/SCTicTacToe;component/images/Terran_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
                                 <Viewbox Width="20" Margin="5,0,0,0">
                                     <RadioButton GroupName="P1Factions" VerticalAlignment="Center"
-                            IsChecked="{Binding Path=NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            IsChecked="{Binding NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
                             ConverterParameter={x:Static local:PlayerFaction._1_Zerg}}">
                                     </RadioButton>
                                 </Viewbox>
@@ -591,7 +591,7 @@
 
                                 <Viewbox Width="20" Margin="5,0,0,0">
                                     <RadioButton GroupName="P1Factions" VerticalAlignment="Center"
-                            IsChecked="{Binding Path=NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            IsChecked="{Binding NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
                             ConverterParameter={x:Static local:PlayerFaction._2_Protoss}}">
                                     </RadioButton>
                                 </Viewbox>
@@ -657,21 +657,21 @@
                             <StackPanel Orientation="Horizontal" Margin="80,0,0,0">
                                 <Viewbox Width="20" Margin="5,0,0,0">
                                     <RadioButton GroupName="P2Factions" VerticalAlignment="Center"
-                            IsChecked="{Binding Path=NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            IsChecked="{Binding NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
                             ConverterParameter={x:Static local:PlayerFaction._0_Terran}}">
                                     </RadioButton>
                                 </Viewbox>
                                 <Image Source="pack://application:,,,/SCTicTacToe;component/images/Terran_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
                                 <Viewbox Width="20" Margin="5,0,0,0">
                                     <RadioButton GroupName="P2Factions" VerticalAlignment="Center"
-                            IsChecked="{Binding Path=NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            IsChecked="{Binding NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
                             ConverterParameter={x:Static local:PlayerFaction._1_Zerg}}">
                                     </RadioButton>
                                 </Viewbox>
                                 <Image Source="pack://application:,,,/SCTicTacToe;component/images/Zerg_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Bottom" Stretch="Fill"/>
                                 <Viewbox Width="20" Margin="5,0,0,0">
                                     <RadioButton GroupName="P2Factions" VerticalAlignment="Center"
-                            IsChecked="{Binding Path=NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            IsChecked="{Binding NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
                             ConverterParameter={x:Static local:PlayerFaction._2_Protoss}}">
                                     </RadioButton>
                                 </Viewbox>
