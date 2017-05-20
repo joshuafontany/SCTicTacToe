@@ -1,0 +1,768 @@
+﻿<Window x:Class="SCTicTacToe.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:gif="clr-namespace:XamlAnimatedGif;assembly=XamlAnimatedGif"
+        xmlns:local="clr-namespace:SCTicTacToe"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        mc:Ignorable="d"
+        Name="myMainWindow" Title="StarCraft Classic TicTacToe" Height="768" Width="1024" MinWidth="512" MinHeight="384" WindowStartupLocation="CenterScreen" Background="Black" Foreground="White"
+        UseLayoutRounding="True">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding CloseWindowCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <local:RadioButtonCheckedConverter x:Key="radioButtonCheckedConverter" />
+        <local:BoolInverterConverter x:Key="boolInverterConverter" />
+        <local:MainWindowViewModel x:Key="MainViewModel" />
+    </Window.Resources>
+    <Grid Name="MainGrid" SizeChanged="MainGrid_SizeChanged">
+        <Grid.LayoutTransform>
+            <ScaleTransform x:Name="ApplicationScaleTransform"
+                        CenterX="0"
+                        CenterY="0"
+                        ScaleX="{Binding ElementName=myMainWindow, Path=ScaleValue}"
+                        ScaleY="{Binding ElementName=myMainWindow, Path=ScaleValue}" />
+        </Grid.LayoutTransform>
+        <Image Name="Background" Opacity="0.8" Source="{Binding CurrentBackground}" Margin="10" Stretch="UniformToFill"/>
+        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+            <Border Grid.Row="0" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0" Width="740" DockPanel.Dock="Top">
+                <Image>
+                    <Image.Style>
+                        <Style TargetType="{x:Type Image}">
+                            <Setter Property="Source" Value="pack://application:,,,/SCTicTacToe;component/images/starcraft_ttt_logo.png">
+                            </Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding GameInstance.GomokuGame}" Value="False">
+                                    <Setter Property="Source" Value="pack://application:,,,/SCTicTacToe;component/images/starcraft_ttt_logo.png"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding GameInstance.GomokuGame}" Value="True">
+                                    <Setter Property="Source" Value="pack://application:,,,/SCTicTacToe;component/images/starcraft_gomoku_logo.png"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                    <Image.Effect>
+                        <DropShadowEffect Direction="225" ShadowDepth="8" BlurRadius="10" Opacity="0.9" />
+                    </Image.Effect>
+                </Image>
+            </Border>
+            <Grid x:Name="LayoutGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="5,0,5,20" DockPanel.Dock="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="0,10">
+                    <!-- Player1 -->
+                    <Button Margin="5"
+                    FontWeight="Bold" Background="Black" Foreground="Silver"
+                    HorizontalContentAlignment="Left" Height="140">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Style.Resources>
+                                    <DropShadowEffect x:Key="MyDropShadowEffect"
+                                      Direction="225"
+                                      ShadowDepth="20"
+                                      BlurRadius="10"
+                                      Opacity="0.8"/>
+                                </Style.Resources>
+                                <Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/>
+                                <Setter Property="Effect" Value="{StaticResource MyDropShadowEffect}"/>
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                                <Setter Property="BorderThickness" Value="6"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <ControlTemplate.Resources>
+                                                <Storyboard x:Key="ShowShinePlayer">
+                                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ShinePlayer" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                                        <SplineDoubleKeyFrame KeyTime="00:00:00.5000000" Value="1"/>
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                                <Storyboard x:Key="HideShinePlayer">
+                                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ShinePlayer" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                                        <SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0"/>
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </ControlTemplate.Resources>
+                                            <Border CornerRadius="5,5,5,5" BorderThickness="1,1,1,1" RenderTransformOrigin="0.5,0.5" x:Name="borderPlayer" BorderBrush="Silver">
+                                                <Border.RenderTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                                        <SkewTransform AngleX="0" AngleY="0"/>
+                                                        <RotateTransform Angle="0"/>
+                                                        <TranslateTransform X="0" Y="0"/>
+                                                    </TransformGroup>
+                                                </Border.RenderTransform>
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="5,5,5,5" x:Name="border1Player">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="1*"/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Grid.Row="0" Opacity="0" x:Name="ShinePlayer" Width="Auto" Height="Auto" CornerRadius="5,5,5,5" Margin="0,0,0,0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                    <GradientStop Color="#00708090" Offset="0"/>
+                                                                    <GradientStop Color="#7E708090" Offset="1"/>
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                        </Border>
+                                                        <ContentPresenter  VerticalAlignment="Center" HorizontalAlignment="Center" Grid.RowSpan="1" x:Name="contentPresenterPlayer"/>
+                                                    </Grid>
+                                                </Border>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" TargetName="border1Player" Value="0.5"/>
+                                                    <Setter Property="Opacity" TargetName="borderPlayer" Value="0.5"/>
+                                                    <Setter Property="Opacity" TargetName="contentPresenterPlayer" Value="0.5"/>
+                                                </Trigger>
+                                                <DataTrigger Binding="{Binding GameInstance.Player1Turn}" Value="False">
+                                                    <Setter Property="RenderTransform" TargetName="borderPlayer">
+                                                        <Setter.Value>
+                                                            <TransformGroup>
+                                                                <ScaleTransform ScaleX="0.9" ScaleY="0.9"/>
+                                                                <SkewTransform AngleX="0" AngleY="0"/>
+                                                                <RotateTransform Angle="0"/>
+                                                                <TranslateTransform X="0" Y="0"/>
+                                                            </TransformGroup>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding GameInstance.Player1Turn}" Value="True">
+                                                    <DataTrigger.ExitActions>
+                                                        <BeginStoryboard Storyboard="{StaticResource HideShinePlayer}" x:Name="HideShine_BeginStoryboard"/>
+                                                    </DataTrigger.ExitActions>
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard x:Name="ShowShine_BeginStoryboard" Storyboard="{StaticResource ShowShinePlayer}"/>
+                                                    </DataTrigger.EnterActions>
+                                                </DataTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="120">
+                            <Image Source="{Binding Player1.FactionIcon}" Width="90" Height="120" Margin="2" HorizontalAlignment="Left" VerticalAlignment="Top" Stretch="Fill"/>
+                            <StackPanel Margin="80, 4, 4, 4">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{Binding Player1.HeroIcon}" Width="64" Height="64" Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
+                                    <Image gif:AnimationBehavior.SourceUri="{Binding Player1.GamePieceImage}" gif:AnimationBehavior.AnimateInDesignMode="True"
+                                           Width="60" Height="56" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
+                                </StackPanel>
+                                <Border Style="{DynamicResource PlayerLabelBorderGlowStyle}"
+                                HorizontalAlignment="Left" VerticalAlignment="Center" >
+                                    <Label Content="{Binding Player1.Name}" FontSize="18" FontFamily=".\#Starcraft Normal" Foreground="White" FontWeight="Normal" Margin="5">
+                                    </Label>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <!-- Verus -->
+                    <Image Source="pack://application:,,,/SCTicTacToe;component/images/versus.png" Width="100">
+                        <Image.Effect>
+                            <DropShadowEffect Direction="225" ShadowDepth="10" BlurRadius="10" Opacity="0.9" />
+                        </Image.Effect>
+                    </Image>
+                    <!-- Player 2-->
+                    <Button Margin="5"
+                    FontWeight="Bold" Background="Black" Foreground="Silver"
+                    HorizontalContentAlignment="Left" Height="140">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Style.Resources>
+                                    <DropShadowEffect x:Key="MyDropShadowEffect"
+                                      Direction="225"
+                                      ShadowDepth="20"
+                                      BlurRadius="10"
+                                      Opacity="0.8"/>
+                                </Style.Resources>
+                                <Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/>
+                                <Setter Property="Effect" Value="{StaticResource MyDropShadowEffect}"/>
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                                <Setter Property="BorderThickness" Value="6"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <ControlTemplate.Resources>
+                                                <Storyboard x:Key="ShowShinePlayer">
+                                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ShinePlayer" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                                        <SplineDoubleKeyFrame KeyTime="00:00:00.5000000" Value="1"/>
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                                <Storyboard x:Key="HideShinePlayer">
+                                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ShinePlayer" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                                        <SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0"/>
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </ControlTemplate.Resources>
+                                            <Border CornerRadius="5,5,5,5" BorderThickness="1,1,1,1" RenderTransformOrigin="0.5,0.5" x:Name="borderPlayer" BorderBrush="Silver">
+                                                <Border.RenderTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                                        <SkewTransform AngleX="0" AngleY="0"/>
+                                                        <RotateTransform Angle="0"/>
+                                                        <TranslateTransform X="0" Y="0"/>
+                                                    </TransformGroup>
+                                                </Border.RenderTransform>
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="5,5,5,5" x:Name="border1Player">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="1*"/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Grid.Row="0" Opacity="0" x:Name="ShinePlayer" Width="Auto" Height="Auto" CornerRadius="5,5,5,5" Margin="0,0,0,0">
+                                                            <Border.Background>
+                                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                                    <GradientStop Color="#00708090" Offset="0"/>
+                                                                    <GradientStop Color="#7E708090" Offset="1"/>
+                                                                </LinearGradientBrush>
+                                                            </Border.Background>
+                                                        </Border>
+                                                        <ContentPresenter  VerticalAlignment="Center" HorizontalAlignment="Center" Grid.RowSpan="1" x:Name="contentPresenterPlayer"/>
+                                                    </Grid>
+                                                </Border>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" TargetName="border1Player" Value="0.5"/>
+                                                    <Setter Property="Opacity" TargetName="borderPlayer" Value="0.5"/>
+                                                    <Setter Property="Opacity" TargetName="contentPresenterPlayer" Value="0.5"/>
+                                                </Trigger>
+                                                <DataTrigger Binding="{Binding GameInstance.Player1Turn}" Value="True">
+                                                    <Setter Property="RenderTransform" TargetName="borderPlayer">
+                                                        <Setter.Value>
+                                                            <TransformGroup>
+                                                                <ScaleTransform ScaleX="0.9" ScaleY="0.9"/>
+                                                                <SkewTransform AngleX="0" AngleY="0"/>
+                                                                <RotateTransform Angle="0"/>
+                                                                <TranslateTransform X="0" Y="0"/>
+                                                            </TransformGroup>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding GameInstance.Player1Turn}" Value="False">
+                                                    <DataTrigger.ExitActions>
+                                                        <BeginStoryboard Storyboard="{StaticResource HideShinePlayer}" x:Name="HideShine_BeginStoryboard"/>
+                                                    </DataTrigger.ExitActions>
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard x:Name="ShowShine_BeginStoryboard" Storyboard="{StaticResource ShowShinePlayer}"/>
+                                                    </DataTrigger.EnterActions>
+                                                </DataTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="120">
+                            <Image Source="{Binding Player2.FactionIcon}" Width="90" Height="120" Margin="2" HorizontalAlignment="Left" VerticalAlignment="Top" Stretch="Fill"/>
+                            <StackPanel Margin="80, 4, 4, 4">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{Binding Player2.HeroIcon}" Width="64" Height="64" Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
+                                    <Image gif:AnimationBehavior.SourceUri="{Binding Player2.GamePieceImage}" gif:AnimationBehavior.AnimateInDesignMode="True"
+                                           Width="60" Height="56" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
+                                </StackPanel>
+                                <Border Style="{DynamicResource PlayerLabelBorderGlowStyle}"
+                                HorizontalAlignment="Left" VerticalAlignment="Center" >
+                                    <Label Content="{Binding Player2.Name}" FontSize="18" FontFamily=".\#Starcraft Normal" Foreground="White" FontWeight="Normal" Margin="5">
+                                    </Label>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                </StackPanel>
+
+                <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="3" Margin="0,2,0,30" BorderThickness="1" Background="Black" CornerRadius="5" BorderBrush="Silver">
+                    <Border.Effect>
+                        <DropShadowEffect Direction="225" ShadowDepth="10" BlurRadius="10" Opacity="0.9" />
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBox Visibility="Collapsed" HorizontalAlignment="Center" Height="22" Margin="5" TextWrapping="Wrap" Text="{Binding Foo, Mode=TwoWay}" VerticalAlignment="Top" Width="200"/>
+                        <ListView Margin="10" Name="LeaderboardListView" ItemsSource="{Binding PlayerRecordsInstance.Leaderboard}" Foreground="Silver" Background="Black">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="Focusable" Value="false"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.View>
+                                <GridView ColumnHeaderContainerStyle="{StaticResource lbHeaderStyle}">
+                                    <GridViewColumn  HeaderContainerStyle="{StaticResource lbHeaderStyle}" Width="225">
+                                        <HeaderedContentControl>
+                                            <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                                <TextBlock TextDecorations="Underline" FontFamily=".\#Starcraft Normal" FontSize="20" Foreground="Silver">Leaderboard</TextBlock>
+                                            </Label>
+                                        </HeaderedContentControl>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="{Binding HeroIcon}" Margin="2,0,8,0"></Image>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Name}" FontSize="18" FontFamily=".\#Starcraft Normal" />
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Wins}" FontSize="14"/>
+                                                            <TextBlock Text=" / " FontSize="14"/>
+                                                            <TextBlock Text="{Binding Draws}" FontSize="14"/>
+                                                            <TextBlock Text=" / " FontSize="14"/>
+                                                            <TextBlock Text="{Binding Losses}" FontSize="14"/>
+                                                            <TextBlock Text=" (W/D/L) " FontSize="14"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Total}" FontSize="14"/>
+                                                            <TextBlock Text=" (Total Games) " FontSize="14"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </StackPanel>
+                </Border>
+
+                <Button x:Name="CreditsButton" Grid.Row="2" Grid.Column="0"
+                         Height="40" Width="150"
+                        Margin="5" Padding="10"
+                        Content="CREDITS"
+                        FontFamily=".\#Starcraft Normal" FontWeight="Bold" Background="Black" Foreground="Silver" FontSize="20"
+                        Style="{DynamicResource RoundedButton}" Command="{Binding CreditsButtonCommand}" CommandParameter="True"></Button>
+
+                <local:Gameboard DataContext="{Binding Source={StaticResource MainViewModel}}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="5">
+                </local:Gameboard>
+
+                <Border Grid.Row="1" Grid.Column="1" Margin="10,2" BorderThickness="1" Background="Black" CornerRadius="5" BorderBrush="Silver" Width="255">
+                    <Border.Effect>
+                        <DropShadowEffect Direction="225" ShadowDepth="10" BlurRadius="10" Opacity="0.9" />
+                    </Border.Effect>
+                    <TextBlock FontFamily=".\#Starcraft Normal" FontSize="14" Foreground="Silver" HorizontalAlignment="Center" Margin="10" TextWrapping="Wrap" Text="{Binding GameInstance.GameStatus}" VerticalAlignment="Center" />
+                </Border>
+                
+                <Button x:Name="NewGameButton"
+                Grid.Row="2" Grid.Column="1"
+                Height="40" Width="150"
+                Margin="5" Padding="10"
+                Content="NEW GAME"
+                FontFamily=".\#Starcraft Normal" FontWeight="Bold" Background="Black" Foreground="Silver"
+                Style="{DynamicResource RoundedButton}" Command="{Binding NewGameCommand}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"></Button>
+
+                <Border x:Name="GameOverDialog" Visibility="{Binding GODialogVisible}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="5">
+                    <!--Visibility="Visible" -->
+                    <Grid>
+                        <Border Background="Black" Opacity="0.66" CornerRadius="5" ></Border>
+                        <Border Background="Black"  Margin="20, 50" BorderThickness="1"  CornerRadius="5" BorderBrush="Silver"></Border>
+                        <!-- WinCondition -->
+                        <StackPanel Margin="20, 50">
+                            <StackPanel.Style>
+                                <Style TargetType="{x:Type StackPanel}">
+                                    <Setter Property="Visibility" Value="Collapsed">
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding GameInstance.GameWinnerInt}" Value="1">
+                                            <Setter Property="StackPanel.Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding GameInstance.GameWinnerInt}" Value="2">
+                                            <Setter Property="StackPanel.Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <Image Source="{Binding GameInstance.Winner.HeroIcon}" Margin="2,0,8,0"></Image>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding GameInstance.Winner.Name}" FontSize="18" FontFamily=".\#Starcraft Normal" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding GameInstance.Winner.Wins}" FontSize="14"/>
+                                        <TextBlock Text=" / " FontSize="14"/>
+                                        <TextBlock Text="{Binding GameInstance.Winner.Draws}" FontSize="14"/>
+                                        <TextBlock Text=" / " FontSize="14"/>
+                                        <TextBlock Text="{Binding GameInstance.Winner.Losses}" FontSize="14"/>
+                                        <TextBlock Text=" (W/D/L) " FontSize="14"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding GameInstance.Winner.Total}" FontSize="14"/>
+                                        <TextBlock Text=" (Total Games) " FontSize="14"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <Border Margin="10, 5, 10, 0" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                                <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextDecorations="Underline" FontSize="30" FontFamily=".\#Starcraft Normal">WINS!</TextBlock>
+                                </Label>
+                            </Border>
+                        </StackPanel>
+                        <!-- Draw Coondition -->
+                        <StackPanel Margin="20, 50">
+                            <StackPanel.Style>
+                                <Style TargetType="{x:Type StackPanel}">
+                                    <Setter Property="Visibility" Value="Collapsed">
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding GameInstance.GameWinnerInt}" Value="0">
+                                            <Setter Property="StackPanel.Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <Border Margin="10, 5, 10, 0" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                                <StackPanel>
+                                    <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                        <TextBlock TextDecorations="Underline" FontSize="30" FontFamily=".\#Starcraft Normal">Draw!</TextBlock>
+                                    </Label>
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Image Source="{Binding GameInstance.Player1.HeroIcon}" Margin="2,0,8,0"></Image>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding GameInstance.Player1.Name}" FontSize="18" FontFamily=".\#Starcraft Normal" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding GameInstance.Player1.Wins}" FontSize="14"/>
+                                                <TextBlock Text=" / " FontSize="14"/>
+                                                <TextBlock Text="{Binding GameInstance.Player1.Draws}" FontSize="14"/>
+                                                <TextBlock Text=" / " FontSize="14"/>
+                                                <TextBlock Text="{Binding GameInstance.Player1.Losses}" FontSize="14"/>
+                                                <TextBlock Text=" (W/D/L) " FontSize="14"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding GameInstance.Player1.Total}" FontSize="14"/>
+                                                <TextBlock Text=" (Total Games) " FontSize="14"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Image Source="{Binding GameInstance.Player2.HeroIcon}" Margin="2,0,8,0"></Image>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding GameInstance.Player2.Name}" FontSize="18" FontFamily=".\#Starcraft Normal" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding GameInstance.Player2.Wins}" FontSize="14"/>
+                                                <TextBlock Text=" / " FontSize="14"/>
+                                                <TextBlock Text="{Binding GameInstance.Player2.Draws}" FontSize="14"/>
+                                                <TextBlock Text=" / " FontSize="14"/>
+                                                <TextBlock Text="{Binding GameInstance.Player2.Losses}" FontSize="14"/>
+                                                <TextBlock Text=" (W/D/L) " FontSize="14"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding GameInstance.Player2.Total}" FontSize="14"/>
+                                                <TextBlock Text=" (Total Games) " FontSize="14"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DockPanel>
+
+        <DockPanel Width="1000" VerticalAlignment="Bottom" Margin="0,5,0,5">
+            <Button 
+                Height="60"
+                Margin="5" Padding="10"
+                Background="Black" Foreground="Silver"
+                Style="{DynamicResource RoundedButton}" Command="{Binding ChangeBackgroundCommand, Mode=OneWay}" CommandParameter="-1">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" Margin="0">
+                        <Rectangle Width="10" Height="30" Stroke="Black" Fill="Black" VerticalAlignment="Center"/>
+                        <Polygon Points= "20,0 0,15 20,30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                        <Rectangle Width="10" Height="30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                        <TextBlock FontWeight="Bold" Background="Black" Foreground="Silver" FontFamily=".\#Starcraft Normal" FontSize="16" Margin="10,2,10,2">
+                            Previous<LineBreak/>
+                            Background
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Button>
+            <Button Height="60"
+                    Margin="5" Padding="10"
+                    FontWeight="Bold" Background="Black" Foreground="Silver"
+                    Style="{DynamicResource RoundedButton}" DockPanel.Dock="Right" HorizontalAlignment="Right" Command="{Binding ChangeBackgroundCommand, Mode=OneWay}" CommandParameter="1">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" Margin="0">
+                        <TextBlock FontWeight="Bold" Foreground="Silver" FontFamily=".\#Starcraft Normal" FontSize="16" Margin="10,2,10,2">
+                                Next<LineBreak/>
+                                Background
+                        </TextBlock>
+                        <Rectangle Width="10" Height="30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                        <Polygon Points= "0,0 20,15 0,30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                        <Rectangle Width="10" Height="30" Stroke="Black" Fill="Black" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Button>
+        </DockPanel>
+
+        <Border x:Name="NewGameDialog" Visibility="{Binding NGDialogVisible}">
+            <!--Visibility="Visible"  -->
+            <Grid>
+                <Border Background="Black" Opacity="0.66"></Border>
+                <Border Background="Black"  Margin="150, 50, 150, 50" BorderThickness="1"  CornerRadius="5" BorderBrush="Silver"></Border>
+                <StackPanel Margin="150, 50, 150, 50">
+                    <Border Margin="10, 5, 10, 0" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                        <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <TextBlock TextDecorations="Underline" FontSize="30" FontFamily=".\#Starcraft Normal">NEW GAME</TextBlock>
+                        </Label>
+                    </Border>
+                    <Grid>
+                        <StackPanel HorizontalAlignment="Left" Width="150" Margin="20,0,10,0">
+                            <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Left" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                <TextBlock TextDecorations="Underline" FontSize="18" FontFamily=".\#Starcraft Normal">Game Mode</TextBlock>
+                            </Label>
+                            <RadioButton GroupName="GameModeRadio" VerticalAlignment="Center" Margin="10,0,10,5" 
+                                        IsChecked="{Binding NewGameGomoku, Mode=TwoWay,
+                                Converter={StaticResource boolInverterConverter}}" HorizontalAlignment="Left">
+                                <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock FontSize="12" FontFamily=".\#Starcraft Normal">Tic Tac Toe</TextBlock>
+                                </Label>
+                            </RadioButton>
+                            <RadioButton GroupName="GameModeRadio" VerticalAlignment="Center" Margin="10,0,10,0"
+                                IsChecked="{Binding NewGameGomoku}" HorizontalAlignment="Left">
+                                <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock FontSize="12" FontFamily=".\#Starcraft Normal">Gomoku</TextBlock>
+                                </Label>
+                            </RadioButton>
+                        </StackPanel>
+                        <TextBlock Margin="180,0,15,0" FontSize="12" TextWrapping="Wrap" Height="Auto" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                   <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NewGameGomoku}" Value="False">
+                                            <Setter Property="Text" Value="Each game of Tic Tac Toe represents a skirmish in the never-ending struggle between the Terrans, Zerg, and Protoss forces. Players take turns placing troops on the battlefield. In order to win the battle, the player must be the first to place 3 units in a straight line in one direction - vertically, horizontally, or diagonally. Players will switch positions when starting a new game, as Player 1 has an advantege in being able to place the first piece." />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding NewGameGomoku}" Value="True">
+                                            <Setter Property="Text" Value="Each game of Gomoku represents a skirmish in the never-ending struggle between the Terrans, Zerg, and Protoss forces. Players take turns placing troops on the battlefield. In order to win the battle, the player must be the first to place 5 units in a straight line in one direction - vertically, horizontally, or diagonally. Players will switch positions when starting a new game, as Player 1 has an advantege in being able to place the first piece." />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                               </Style>
+                           </TextBlock.Style>     
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- Player1 Input -->
+                    <Grid Margin="50, 5" HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding NewPlayer1.FactionIcon}" Width="120" Height="160" HorizontalAlignment="Left" VerticalAlignment="Top" Stretch="Fill" Opacity="0.6" Grid.RowSpan="2"/>
+                        <StackPanel  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="100,0,0,0">
+                            <Label Foreground="White" FontSize="14" HorizontalAlignment="Left" Margin="5,0">Edit player name:</Label>
+                            <Border HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0">
+                                <TextBox x:Name="Player1NameBox" Text="{Binding NewPlayer1.Name, Mode=TwoWay}" local:FocusExtension.IsFocused="{Binding IsUserName1Focused}" FontSize="30" FontFamily=".\#Starcraft Normal" FontWeight="Normal" Background="Black" Foreground="White" CaretBrush="White" MaxLength="15" Padding="2"/>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel  Grid.Row="1" Grid.Column="0">
+                            <Label Foreground="White" FontSize="14" HorizontalAlignment="Left" Margin="105,0,0,0">Choose your faction:</Label>
+                            <StackPanel Orientation="Horizontal" Margin="80,0,0,0">
+                                <Viewbox Width="20" Margin="5,0,0,0">
+                                    <RadioButton GroupName="P1Factions" VerticalAlignment="Center"
+                            IsChecked="{Binding Path=NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            ConverterParameter={x:Static local:PlayerFaction._0_Terran}}">
+                                    </RadioButton>
+                                </Viewbox>
+                                <Image Source="pack://application:,,,/SCTicTacToe;component/images/Terran_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
+                                <Viewbox Width="20" Margin="5,0,0,0">
+                                    <RadioButton GroupName="P1Factions" VerticalAlignment="Center"
+                            IsChecked="{Binding Path=NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            ConverterParameter={x:Static local:PlayerFaction._1_Zerg}}">
+                                    </RadioButton>
+                                </Viewbox>
+                                <Image Source="pack://application:,,,/SCTicTacToe;component/images/Zerg_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Bottom" Stretch="Fill"/>
+
+                                <Viewbox Width="20" Margin="5,0,0,0">
+                                    <RadioButton GroupName="P1Factions" VerticalAlignment="Center"
+                            IsChecked="{Binding Path=NewPlayer1.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            ConverterParameter={x:Static local:PlayerFaction._2_Protoss}}">
+                                    </RadioButton>
+                                </Viewbox>
+                                <Image Source="pack://application:,,,/SCTicTacToe;component/images/Protoss_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Bottom" Stretch="Fill" Margin="0,0,5,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel  Grid.Column="1" Grid.Row="1" VerticalAlignment="Bottom">
+                            <TextBlock Foreground="White" FontSize="14" HorizontalAlignment="CEnter" Margin="5,0">
+                            Choose a Hero avatar:
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="10,0" HorizontalAlignment="Center">
+
+                                <Button Height="40" Width="40" Style="{StaticResource RoundedButton}"
+                                    Background="Black" BorderBrush="Silver" Command="{Binding ChangeHeroCommand, Mode=OneWay}" CommandParameter="1,-1">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Polygon Points= "20,0 0,15 20,30" Stroke="DarkGray" Fill="DarkGray" />
+                                            <Rectangle Width="10" Height="30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                                <Image Source="{Binding NewPlayer1.HeroIcon}" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Bottom" Stretch="Fill" Margin="10"/>
+                                <Button Height="40" Width="40" Style="{StaticResource RoundedButton}"
+                                    Background="Black" BorderBrush="Silver"  Command="{Binding ChangeHeroCommand, Mode=OneWay}" CommandParameter="1,1">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Rectangle Width="10" Height="30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                                            <Polygon Points= "0,0 20,15 0,30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Verus -->
+                    <Image Source="pack://application:,,,/SCTicTacToe;component/images/versus.png" Width="100">
+                        <Image.Effect>
+                            <DropShadowEffect Direction="225" ShadowDepth="10" BlurRadius="10" Opacity="0.9" Color="Gray" />
+                        </Image.Effect>
+                    </Image>
+                    <!-- Player2 Input -->
+                    <Grid Margin="50, 5" HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding NewPlayer2.FactionIcon}" Width="120" Height="160" HorizontalAlignment="Left" VerticalAlignment="Top" Stretch="Fill" Opacity="0.6" Grid.RowSpan="2"/>
+                        <StackPanel  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="100,0,0,0">
+                            <Label Foreground="White" FontSize="14" HorizontalAlignment="Left" Margin="5,0">Edit player name:</Label>
+                            <Border HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0">
+                                <TextBox x:Name="Player2NameBox" Text="{Binding NewPlayer2.Name, Mode=TwoWay}" local:FocusExtension.IsFocused="{Binding IsUserName2Focused}" FontSize="30" FontFamily=".\#Starcraft Normal" FontWeight="Normal" Background="Black" Foreground="White" CaretBrush="White" MaxLength="15" Padding="2"/>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel  Grid.Row="1" Grid.Column="0">
+                            <Label Foreground="White" FontSize="14" HorizontalAlignment="Left" Margin="105,0,0,0">Choose your faction:</Label>
+                            <StackPanel Orientation="Horizontal" Margin="80,0,0,0">
+                                <Viewbox Width="20" Margin="5,0,0,0">
+                                    <RadioButton GroupName="P2Factions" VerticalAlignment="Center"
+                            IsChecked="{Binding Path=NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            ConverterParameter={x:Static local:PlayerFaction._0_Terran}}">
+                                    </RadioButton>
+                                </Viewbox>
+                                <Image Source="pack://application:,,,/SCTicTacToe;component/images/Terran_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Fill"/>
+                                <Viewbox Width="20" Margin="5,0,0,0">
+                                    <RadioButton GroupName="P2Factions" VerticalAlignment="Center"
+                            IsChecked="{Binding Path=NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            ConverterParameter={x:Static local:PlayerFaction._1_Zerg}}">
+                                    </RadioButton>
+                                </Viewbox>
+                                <Image Source="pack://application:,,,/SCTicTacToe;component/images/Zerg_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Bottom" Stretch="Fill"/>
+                                <Viewbox Width="20" Margin="5,0,0,0">
+                                    <RadioButton GroupName="P2Factions" VerticalAlignment="Center"
+                            IsChecked="{Binding Path=NewPlayer2.PlayerFaction, Mode=TwoWay, Converter={StaticResource radioButtonCheckedConverter}, 
+                            ConverterParameter={x:Static local:PlayerFaction._2_Protoss}}">
+                                    </RadioButton>
+                                </Viewbox>
+                                <Image Source="pack://application:,,,/SCTicTacToe;component/images/Protoss_Icon.png" Width="60" Height="80" HorizontalAlignment="Left" VerticalAlignment="Bottom" Stretch="Fill" Margin="0,0,5,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel  Grid.Column="1" Grid.Row="1" VerticalAlignment="Bottom">
+                            <TextBlock Foreground="White" FontSize="14" HorizontalAlignment="CEnter" Margin="5,0">
+                            Choose a Hero avatar:
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="10,0" HorizontalAlignment="Center">
+
+                                <Button Height="40" Width="40" Style="{StaticResource RoundedButton}"
+                                    Background="Black" BorderBrush="Silver" Command="{Binding ChangeHeroCommand, Mode=OneWay}" CommandParameter="2,-1">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Polygon Points= "20,0 0,15 20,30" Stroke="DarkGray" Fill="DarkGray" />
+                                            <Rectangle Width="10" Height="30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                                <Image Source="{Binding NewPlayer2.HeroIcon}" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Bottom" Stretch="Fill" Margin="10"/>
+                                <Button Height="40" Width="40" Style="{StaticResource RoundedButton}"
+                                    Background="Black" BorderBrush="Silver"  Command="{Binding ChangeHeroCommand, Mode=OneWay}" CommandParameter="2,1">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Rectangle Width="10" Height="30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                                            <Polygon Points= "0,0 20,15 0,30" Stroke="DarkGray" Fill="DarkGray" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal"  Margin="50, 5" HorizontalAlignment="Center">
+
+                        <Button x:Name="ConfirmNewGameButton"
+                        Grid.Row="2" Grid.Column="1"
+                        Height="50" Width="200"
+                        Margin="10,5,50,5" Padding="10"
+                        Content="START GAME"
+                        FontWeight="Bold" Background="Black" Foreground="White"
+                        Style="{DynamicResource RoundedButton}" Command="{Binding ConfirmNewGameCommand}" CommandParameter="Confirm" FontSize="24"></Button>
+
+                        <Button x:Name="CancleNewGameButton"
+                        Grid.Row="2" Grid.Column="1"
+                        Height="50" Width="200"
+                        Margin="50,5,10,5" Padding="10"
+                        Content="CANCEL"
+                        FontWeight="Bold" Background="Black" Foreground="White"
+                        Style="{DynamicResource RoundedButton}" Command="{Binding ConfirmNewGameCommand}" CommandParameter="Cancel" FontSize="24"></Button>
+                    </StackPanel>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+        <Border x:Name="CreditsDialog" Visibility="{Binding CreditsDialogVisible}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="5">
+            <!--Visibility="{Binding CreditsDialogVisible}"-->
+            <Grid>
+                <Border Background="Black" Opacity="0.66"></Border>
+                <Border Background="Black"  Margin="150, 50, 150, 50" BorderThickness="1"  CornerRadius="5" BorderBrush="Silver"></Border>
+                <StackPanel Margin="150, 50, 150, 50">
+                    <Border Margin="10, 5, 10, 0" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                        <Label FontSize="16" Foreground="White" FontWeight="Normal" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <TextBlock TextDecorations="Underline" FontSize="30" FontFamily=".\#Starcraft Normal" HorizontalAlignment="Center" VerticalAlignment="Center">Credits</TextBlock>
+                        </Label>
+                    </Border>
+                    <TextBlock Margin="10,0,10,0" FontSize="12" TextWrapping="Wrap" Height="Auto" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            Code and Graphic Design by Joshua Fontany<LineBreak />
+                            Email: joshua.fontany@gmail.com <LineBreak />
+                            LinkedIn: https://www.linkedin.com/in/joshuafontany/<LineBreak />
+                            <LineBreak />
+                            Original Starcraft 1 and 2 graphics © Blizzard Entertainment.<LineBreak />
+                            <LineBreak />
+                            Used without permission. Any use of Blizzard Entertainment's <LineBreak />
+                            copyrighted material or trademarks in this file should not be <LineBreak />
+                            viewed as a challenge to those copyrights or trademarks.    
+                                
+                        </TextBlock>
+                    <Button x:Name="CloseCreditsButton"
+                        Height="30" Width="200"
+                        Margin="10,5,10,20" Padding="10"
+                        Content="Close Credits"
+                        FontWeight="Bold" Background="Black" Foreground="White"
+                        Style="{DynamicResource RoundedButton}" Command="{Binding CreditsButtonCommand}" CommandParameter="False" FontSize="18" HorizontalAlignment="Center"></Button>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
