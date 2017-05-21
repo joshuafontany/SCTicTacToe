@@ -30,7 +30,7 @@
                         ScaleX="{Binding ElementName=myMainWindow, Path=ScaleValue}"
                         ScaleY="{Binding ElementName=myMainWindow, Path=ScaleValue}" />
         </Grid.LayoutTransform>
-        <Image Name="Background" Opacity="0.8" Source="{Binding CurrentBackground}" Margin="10" Stretch="UniformToFill"/>
+        <Image Opacity="0.8" Source="{Binding CurrentBackground}" Margin="10" Stretch="UniformToFill"/>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Top">
             <Border Grid.Row="0" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,0" Width="740" DockPanel.Dock="Top">
                 <Image>
